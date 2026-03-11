@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="UiPath Enterprise Robot Installer Tool"
     Width="1024"
-    Height="768"
+    Height="1080"
     WindowStartupLocation="CenterScreen"
     ResizeMode="CanResize">
 

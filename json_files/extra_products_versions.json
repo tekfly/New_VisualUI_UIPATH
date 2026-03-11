@@ -1,0 +1,17 @@
+{
+  "Chrome": {
+    "Latest": "http://dl.google.com/chrome/install/chrome_installer.exe"
+  },
+  "URL_Rewrite": {
+    "Latest": "https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi"
+  },
+  "dotNet": {
+    "6.0.27": "https://download.visualstudio.microsoft.com/download/pr/04389c24-12a9-4e0e-8498-31989f30bb22/141aef28265938153eefad0f2398a73b/dotnet-hosting-6.0.27-win.exe"
+  },
+  "UiPath_Powershell": {
+    "Latest": "https://raw.githubusercontent.com/UiPath/Infrastructure/master/Setup/InstallRolesAndFeatures.ps1"
+  },
+  "NotePad++": {
+    "8.8": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.8/npp.8.8.Installer.x64.exe"
+  }
+}
