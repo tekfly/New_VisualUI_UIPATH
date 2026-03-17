@@ -94,7 +94,7 @@
 
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="NextToInstallBtn"
-                    Content="Next → Installation"
+                    Content="Next -> Installation"
                     Width="180"
                     Height="35"
                     IsEnabled="False"/>

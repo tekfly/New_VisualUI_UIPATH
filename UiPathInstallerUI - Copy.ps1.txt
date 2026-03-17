@@ -145,7 +145,7 @@ function New-ProductRow {
         if (-not $cbV) { return } #Prevents null reference
         $cbV.Items.Clear()
         $sel = $cbP.SelectedItem
-        if ($sel -and $JsonSource.$sel) {
+        if ($sel -and $JsonSource) {
             $versions = $JsonSource.$sel.PSObject.Properties.Name
             foreach ($v in $versions) { [void]$cbV.Items.Add($v) }
             if ($cbV.Items.Count -gt 0) { $cbV.SelectedIndex = 0 }
