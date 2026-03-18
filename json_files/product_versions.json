@@ -1,14 +1,38 @@
 {
   "Orchestrator": {
-    "22.10.16": "https://download.uipath.com/versions/22.10.16/UiPathOrchestrator.msi",
-    "23.4.14": "https://download.uipath.com/versions/23.4.14/UiPathOrchestrator.msi",
-    "23.10.11": "https://download.uipath.com/versions/23.10.11/UiPathOrchestrator.msi",
-    "24.10.2": "https://download.uipath.com/versions/24.10.2/UiPathOrchestrator.msi"
+    "21.10.16": "https://download.uipath.com/versions/21.10.16/UiPathOrchestrator.msi",
+    "22.4.18": "https://download.uipath.com/versions/22.4.18/UiPathOrchestrator.msi",
+    "22.10.18": "https://download.uipath.com/versions/22.10.18/UiPathOrchestrator.msi",
+    "23.4.16": "https://download.uipath.com/versions/23.4.16/UiPathOrchestrator.msi",
+    "23.10.15": "https://download.uipath.com/versions/23.10.15/UiPathOrchestrator.msi",
+    "24.10.7": "https://download.uipath.com/versions/24.10.7/UiPathOrchestrator.msi",
+    "25.10.1": "https://download.uipath.com/versions/25.10.1/UiPathOrchestrator.msi"
+  },    
+  "Action Center": {
+    "21.10.4": "https://download.uipath.com/versions/21.10.4/ActionCenter.msi",
+    "22.4.15": "https://download.uipath.com/versions/22.4.15/ActionCenter.msi",
+    "22.10.13": "https://download.uipath.com/versions/22.10.13/ActionCenter.msi",
+    "23.4.13": "https://download.uipath.com/versions/23.4.13/ActionCenter.msi",
+    "23.10.12": "https://download.uipath.com/versions/23.10.12/ActionCenter.msi",
+    "24.10.6": "https://download.uipath.com/versions/24.10.6/ActionCenter.msi",
+    "25.10.0": "https://download.uipath.com/versions/25.10.0/ActionCenter.msi"
+  },
+  "TestManager": {
+    "21.10.7": "https://download.uipath.com/versions/21.10.7/TestManager.msi",
+    "22.4.13": "https://download.uipath.com/versions/22.4.13/TestManager.msi",
+    "22.10.12": "https://download.uipath.com/versions/22.10.12/TestManager.msi",
+    "23.4.11": "https://download.uipath.com/versions/23.4.11/TestManager.msi",
+    "23.10.12": "https://download.uipath.com/versions/23.10.12/TestManager.msi",
+    "24.10.6": "https://download.uipath.com/versions/24.10.6/TestManager.msi",
+    "25.10.0": "https://download.uipath.com/versions/25.10.0/TestManager.msi"
   },
   "Robot/Studio": {
     "21.10.10": "https://download.uipath.com/versions/21.10.10/UiPathStudio.msi",
-    "22.10.17": "https://download.uipath.com/versions/22.10.17/UiPathStudio.msi",
-    "23.10.12": "https://download.uipath.com/versions/23.10.12/UiPathStudio.msi",
-    "24.10.10": "https://download.uipath.com/versions/24.10.10/UiPathStudio.msi"
+    "22.4.10": "https://download.uipath.com/versions/22.4.10/UiPathStudio.msi",
+    "22.10.18": "https://download.uipath.com/versions/22.10.18/UiPathStudio.msi",
+    "23.4.14": "https://download.uipath.com/versions/23.4.14/UiPathStudio.msi",
+    "23.10.15": "https://download.uipath.com/versions/23.10.15/UiPathStudio.msi",
+    "24.10.20": "https://download.uipath.com/versions/24.10.20/UiPathStudio.msi",
+    "25.10.7": "https://download.uipath.com/versions/25.10.7/UiPathStudio.msi"
   }
 }
