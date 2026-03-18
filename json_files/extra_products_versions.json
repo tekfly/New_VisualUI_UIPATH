@@ -13,7 +13,7 @@
     "Latest": "https://raw.githubusercontent.com/UiPath/Infrastructure/master/Setup/InstallRolesAndFeatures.ps1"
   },
   "NotePad++": {
-	"8.9.2": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.2/npp.8.9.2.Installer.x64.exe"  
+	"8.9.2": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.2/npp.8.9.2.Installer.x64.exe",
     "8.8": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.8/npp.8.8.Installer.x64.exe"
   },
   "NSSM": {
