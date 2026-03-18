@@ -6,6 +6,7 @@
     "24.10.2": "https://download.uipath.com/versions/24.10.2/UiPathOrchestrator.msi"
   },
   "Robot/Studio": {
+    "21.10.10": "https://download.uipath.com/versions/21.10.10/UiPathStudio.msi",
     "22.10.17": "https://download.uipath.com/versions/22.10.17/UiPathStudio.msi",
     "23.10.12": "https://download.uipath.com/versions/23.10.12/UiPathStudio.msi",
     "24.10.10": "https://download.uipath.com/versions/24.10.10/UiPathStudio.msi"
