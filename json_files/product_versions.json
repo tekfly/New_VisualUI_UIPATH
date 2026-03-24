@@ -5,8 +5,9 @@
     "22.10.18": "https://download.uipath.com/versions/22.10.18/UiPathOrchestrator.msi",
     "23.4.16": "https://download.uipath.com/versions/23.4.16/UiPathOrchestrator.msi",
     "23.10.15": "https://download.uipath.com/versions/23.10.15/UiPathOrchestrator.msi",
-    "24.10.7": "https://download.uipath.com/versions/24.10.7/UiPathOrchestrator.msi",
-    "25.10.1": "https://download.uipath.com/versions/25.10.1/UiPathOrchestrator.msi"
+    "24.10.7": "https://download.uipath.com/versions/24.10.7-standalone/UiPathOrchestrator.msi",
+    "25.10.1": "https://download.uipath.com/versions/25.10.1-standalone/UiPathOrchestrator.msi",
+    "25.10.2": "https://download.uipath.com/versions/25.10.2-standalone/UiPathOrchestrator.msi"
   },    
   "Action Center": {
     "21.10.4": "https://download.uipath.com/versions/21.10.4/ActionCenter.msi",
