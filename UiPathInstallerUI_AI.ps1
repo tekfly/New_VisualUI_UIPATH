@@ -33,6 +33,12 @@ if ([Threading.Thread]::CurrentThread.ApartmentState -ne 'STA') {
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
 
+# Invoke-WebRequest/Invoke-RestMethod render a progress bar by default in Windows
+# PowerShell 5.1 that is a well-known major slowdown for larger transfers. We don't use
+# that built-in progress display anywhere (the installer download uses WebClient with
+# its own real byte-level progress instead), so it's safe to turn off globally.
+$ProgressPreference = 'SilentlyContinue'
+
 # ---------------- RESOLVE SCRIPT ROOT (bootstrap remote assets if needed) ----------------
 if ($IsBootstrapped) {
     $ScriptRoot = Join-Path $env:TEMP ("UiPathInstallerUI_{0}" -f ([Guid]::NewGuid()))
@@ -776,19 +782,55 @@ $DownloadBtn.Add_Click({
         return
     }
 
+    # Byte-level progress bar (0-100%) per file, instead of one tick per whole file
+    # completed - which is why it looked stuck at 0% on a single large installer.
     $DownloadProgress.Minimum=0
-    $DownloadProgress.Maximum=$urls.Count
+    $DownloadProgress.Maximum=100
     $DownloadProgress.Value=0
-    $DownloadStatus.Text="Starting..."
 
+    $fileNum = 0
     foreach ($u in $urls) {
+        $fileNum++
         try {
             $name = [System.IO.Path]::GetFileName((New-Object System.Uri($u)).AbsolutePath)
             if (-not $name) { $name = "file_$([Guid]::NewGuid())" }
             $out  = Join-Path $DownloadTargetBox.Text $name
-            $DownloadStatus.Text="Downloading $name..."
-            Invoke-WebRequest $u -OutFile $out -UseBasicParsing
-            $DownloadProgress.Value+=1
+            $label = "($fileNum/$($urls.Count)) $name"
+
+            $DownloadProgress.Value = 0
+            $DownloadStatus.Text = "$label - 0%"
+
+            # System.Net.WebClient is used here instead of Invoke-WebRequest: the latter's
+            # own progress-bar rendering is a well-known bottleneck in Windows PowerShell 5.1
+            # that makes large downloads much slower than the network itself would require.
+            # WebClient also gives real byte-level progress via DownloadProgressChanged,
+            # which is what actually drives the progress bar below.
+            $wc = New-Object System.Net.WebClient
+
+            $subscription = Register-ObjectEvent -InputObject $wc -EventName DownloadProgressChanged -Action {
+                $pct = $Event.SourceEventArgs.ProgressPercentage
+                $ctx = $Event.MessageData
+                $ctx.Bar.Dispatcher.Invoke([Action]{
+                    $ctx.Bar.Value = $pct
+                    $ctx.Status.Text = "$($ctx.Label) - $pct%"
+                })
+            } -MessageData ([pscustomobject]@{ Bar=$DownloadProgress; Status=$DownloadStatus; Label=$label })
+
+            try {
+                $task = $wc.DownloadFileTaskAsync($u, $out)
+                while (-not $task.IsCompleted) {
+                    Start-Sleep -Milliseconds 100
+                    [System.Windows.Forms.Application]::DoEvents()
+                }
+                if ($task.IsFaulted) { throw $task.Exception.GetBaseException() }
+            } finally {
+                Unregister-Event -SourceIdentifier $subscription.Name -ErrorAction SilentlyContinue
+                Remove-Job $subscription -Force -ErrorAction SilentlyContinue
+                $wc.Dispose()
+            }
+
+            $DownloadProgress.Value = 100
+            $DownloadStatus.Text = "$label - 100%"
         } catch {
             Show-Error "Failed to download $u`n$($_.Exception.Message)"
             break
