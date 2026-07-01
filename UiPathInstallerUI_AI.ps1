@@ -39,6 +39,15 @@ Add-Type -AssemblyName System.Windows.Forms
 # its own real byte-level progress instead), so it's safe to turn off globally.
 $ProgressPreference = 'SilentlyContinue'
 
+# Windows PowerShell 5.1 does not always default to TLS 1.2/1.3, and GitHub/Microsoft
+# endpoints require it. Without this, HTTPS calls throw a silent SSL/TLS handshake
+# exception that Test-Online (and the JSON/installer downloads) simply reports as
+# "offline" or "failed" even though the machine has a perfectly fine connection.
+try {
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol `
+        -bor [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11
+} catch { }
+
 # ---------------- RESOLVE SCRIPT ROOT (bootstrap remote assets if needed) ----------------
 if ($IsBootstrapped) {
     $ScriptRoot = Join-Path $env:TEMP ("UiPathInstallerUI_{0}" -f ([Guid]::NewGuid()))
@@ -215,15 +224,29 @@ function Update-JsonFilesFromGitHub {
     return $errors
 }
 
-function Test-Online {
+function Test-SingleUrlReachable($url, $method) {
     try {
-        $req = [System.Net.WebRequest]::Create("https://www.microsoft.com")
-        $req.Method="HEAD"
-        $req.Timeout=2000
-        $resp=$req.GetResponse()
+        $req = [System.Net.WebRequest]::Create($url)
+        $req.Method  = $method
+        $req.Timeout = 5000
+        $req.Proxy   = [System.Net.WebRequest]::GetSystemWebProxy()
+        $req.Proxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
+        $resp = $req.GetResponse()
         $resp.Close()
         return $true
     } catch { return $false }
+}
+
+function Test-Online {
+    # Tries a couple of well-known hosts, HEAD first then GET (some networks/proxies
+    # block HEAD specifically), with a proxy-aware, more generous timeout - a single
+    # short HEAD-only check to one host was giving false "offline" reports on some
+    # machines (e.g. slower TLS handshake, corporate proxy, or HEAD being blocked).
+    foreach ($url in @("https://raw.githubusercontent.com","https://www.microsoft.com")) {
+        if (Test-SingleUrlReachable $url "HEAD") { return $true }
+        if (Test-SingleUrlReachable $url "GET")  { return $true }
+    }
+    return $false
 }
 
 function Test-ValidMsiSignature($path) {
