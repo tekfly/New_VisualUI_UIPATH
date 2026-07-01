@@ -6,17 +6,62 @@
 # Client-credentials MSI auto connect or Machine Key fallback
 # =====================================================================
 
+# Base URL used both to self-relaunch (when invoked via "irm <url> | iex", where there
+# is no on-disk file to elevate/re-run with -File) and to fetch the XAML + JSON assets
+# this script needs when it isn't sitting next to them on disk.
+$global:RemoteBaseUrl = "https://raw.githubusercontent.com/tekfly/New_VisualUI_UIPATH/main"
+$global:SelfScriptUrl = "$($global:RemoteBaseUrl)/UiPathInstallerUI_AI.ps1"
+
+# When run via "irm <url> | iex" there is no on-disk script file, so $PSScriptRoot and
+# $PSCommandPath are both empty. Detect that so we know to bootstrap our assets from
+# GitHub instead of assuming the XAML/json_files are sitting next to us.
+$IsBootstrapped = [string]::IsNullOrEmpty($PSScriptRoot)
+
 # ---------------- STANDARDS & INITIALIZATION ----------------
 if ([Threading.Thread]::CurrentThread.ApartmentState -ne 'STA') {
-    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -STA -File `"$PSCommandPath`"" -Verb RunAs
+    if ($IsBootstrapped) {
+        # Re-launch by re-downloading and re-piping into a new STA process - there's no
+        # local file to point -File at in this mode.
+        $relaunch = "-NoProfile -ExecutionPolicy Bypass -STA -Command `"irm '$($global:SelfScriptUrl)' | iex`""
+        Start-Process powershell -ArgumentList $relaunch -Verb RunAs
+    } else {
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -STA -File `"$PSCommandPath`"" -Verb RunAs
+    }
     exit
 }
 
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
 
+# ---------------- RESOLVE SCRIPT ROOT (bootstrap remote assets if needed) ----------------
+if ($IsBootstrapped) {
+    $ScriptRoot = Join-Path $env:TEMP ("UiPathInstallerUI_{0}" -f ([Guid]::NewGuid()))
+    New-Item -ItemType Directory -Path $ScriptRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $ScriptRoot "json_files") -Force | Out-Null
+
+    try {
+        Invoke-WebRequest -Uri "$($global:RemoteBaseUrl)/UiPathInstallerUI_AI.xaml" `
+            -OutFile (Join-Path $ScriptRoot "UiPathInstallerUI_AI.xaml") -UseBasicParsing
+    } catch {
+        [System.Windows.MessageBox]::Show("Could not download UiPathInstallerUI_AI.xaml from GitHub.`n$($_.Exception.Message)","Error") | Out-Null
+        exit
+    }
+
+    foreach ($jf in @("product_versions.json","extra_products_versions.json")) {
+        try {
+            Invoke-WebRequest -Uri "$($global:RemoteBaseUrl)/json_files/$jf" `
+                -OutFile (Join-Path $ScriptRoot "json_files\$jf") -UseBasicParsing
+        } catch {
+            # Non-fatal here: Load-Json already falls back to GitHub per-file at UI
+            # startup, so a miss during bootstrap just means it retries there.
+        }
+    }
+} else {
+    $ScriptRoot = $PSScriptRoot
+}
+
 # ---------------- LOAD MAIN XAML ----------------
-$xamlPath = Join-Path $PSScriptRoot "UiPathInstallerUI_AI.xaml"
+$xamlPath = Join-Path $ScriptRoot "UiPathInstallerUI_AI.xaml"
 if (-not (Test-Path $xamlPath)) {
     [System.Windows.MessageBox]::Show("Cannot find XAML: $xamlPath","Error") | Out-Null
     exit
@@ -117,7 +162,7 @@ function Show-Info ($m) { [System.Windows.MessageBox]::Show($m,"Information") | 
 $global:GitJsonBaseUrl = "https://raw.githubusercontent.com/tekfly/New_VisualUI_UIPATH/main/json_files"
 
 function Load-Json($file) {
-    $path = Join-Path $PSScriptRoot "json_files\$file"
+    $path = Join-Path $ScriptRoot "json_files\$file"
 
     if ((Test-Path $path) -and ((Get-Item $path).Length -gt 0)) {
         try {
@@ -145,7 +190,7 @@ function Update-JsonFilesFromGitHub {
     # from GitHub and overwrites the local json_files\ copies, so new UiPath releases
     # show up without needing a new build of this tool.
     $files = @("product_versions.json","extra_products_versions.json")
-    $destDir = Join-Path $PSScriptRoot "json_files"
+    $destDir = Join-Path $ScriptRoot "json_files"
     if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir | Out-Null }
 
     $errors = @()
