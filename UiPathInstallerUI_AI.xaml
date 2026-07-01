@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="UiPath Enterprise Robot Installer Tool"
     Width="1024"
-    Height="1080"
+    Height="800"
+    MaxHeight="850"
     WindowStartupLocation="CenterScreen"
     ResizeMode="CanResize">
 
@@ -31,12 +32,26 @@
             <Grid x:Name="Screen1Grid" Grid.Row="1" Visibility="Visible">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Top">
                     <GroupBox Header="Online Download (optional)" Margin="0 0 0 20">
-                        <Expander Width="Auto" Margin="2,0,2,2">
+                        <Expander Width="Auto" IsExpanded="True" Margin="2,0,2,2">
                             <StackPanel Margin="12">
-                                <TextBlock Text="If this machine has internet, provide one or more direct download URLs (one per line). Each file will be saved into the selected target folder."
+                                <TextBlock Text="If this machine has internet, select the product(s)/version(s) to download. Selections are populated from json_files (falls back to GitHub if the local files are missing/empty). Each file will be saved into the selected target folder."
                                            TextWrapping="Wrap" Margin="0 0 0 10"/>
-                                <TextBlock Text="Download URLs:" FontWeight="SemiBold"/>
-                                <TextBox x:Name="DownloadUrlsBox" Height="120" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+                                    <TextBlock Text="Main Products:" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <Button x:Name="UpdateJsonBtn" Content="Update Version Lists (GitHub)" Width="220" Margin="16 0 0 0"/>
+                                    <TextBlock x:Name="UpdateJsonStatus" Margin="10 0 0 0" VerticalAlignment="Center" Foreground="DimGray"/>
+                                </StackPanel>
+                                <StackPanel x:Name="MainPairsPanel"/>
+                                <Button x:Name="AddMainPairBtn" Content="Add another product" Width="180" Margin="0 6 0 10"/>
+
+                                <CheckBox x:Name="EnableExtraProductsCheck" Content="Download extra products" Margin="0 4 0 4"/>
+                                <StackPanel x:Name="ExtraProductsSection" Visibility="Collapsed">
+                                    <TextBlock Text="Extra Products:" FontWeight="SemiBold" Margin="0 4 0 6"/>
+                                    <StackPanel x:Name="ExtraPairsPanel"/>
+                                    <Button x:Name="AddExtraPairBtn" Content="Add extra product" Width="180" Margin="0 6 0 10"/>
+                                </StackPanel>
+
                                 <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
                                     <TextBlock Text="Target folder:" Width="120" VerticalAlignment="Center"/>
                                     <TextBox x:Name="DownloadTargetBox" Width="600"/>
@@ -69,6 +84,26 @@
                                 <Button x:Name="ValidateInstallerBtn" Content="Validate Files" Width="160"/>
                                 <TextBlock x:Name="InstallerValidationResult" Margin="12 0 0 0" VerticalAlignment="Center" Foreground="DarkBlue"/>
                             </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- INSTALLED SOFTWARE CHECK -->
+                    <GroupBox Header="Check Installed UiPath Software" Margin="0 0 0 20">
+                        <StackPanel Margin="12">
+                            <TextBlock Text="Scans this machine's installed-programs registry and common install folders for any UiPath component already present."
+                                       TextWrapping="Wrap" Margin="0 0 0 10"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="CheckInstalledBtn" Content="Check Installed UiPath Software" Width="240"/>
+                            </StackPanel>
+                            <TextBox x:Name="InstalledSoftwareResult"
+                                     Margin="0 10 0 0"
+                                     Height="120"
+                                     IsReadOnly="True"
+                                     TextWrapping="NoWrap"
+                                     AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     FontFamily="Consolas"/>
                         </StackPanel>
                     </GroupBox>
 
